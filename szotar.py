@@ -1,16 +1,28 @@
 import requests
 from bs4 import BeautifulSoup
 
-letters_url = "https://www.arcanum.com/hu/online-kiadvanyok/Lexikonok-a-magyar-nyelv-ertelmezo-szotara-1BE8B/"
 
-letter_selector = "#page-main-content > div.row > div.col-lg-9 > div.list-group.mb-3 > a"
+def get_letter_links():
+	letters_url = "https://www.arcanum.com/hu/online-kiadvanyok/Lexikonok-a-magyar-nyelv-ertelmezo-szotara-1BE8B/"
 
-letter_link_list = []
+	letter_selector = "list-group-item list-group-item-action"
 
-response = requests.get(letters_url)
+	letter_link_list = {}
 
-html = response.text
+	response = requests.get(letters_url)
 
-soup = BeautifulSoup(html, 'html.parser')
+	html = response.text
 
-print(soup.title)
+	soup = BeautifulSoup(html, 'html.parser')
+
+	letters = soup.find_all("a", letter_selector)
+
+	for letter in letters:
+		if len(letter.text) < 6:
+			letter_link_list[letter.text] = letter.get("href")
+
+	return letter_link_list
+	
+	
+	
+print(get_letter_links())
