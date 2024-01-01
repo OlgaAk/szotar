@@ -21,30 +21,46 @@ def get_word_translation(word):
 	translations = []
 	
 	for translation_element in translations_list.children:
+		
 		if not isinstance(translation_element, NavigableString):
-			print(translation_element.name)
-			one_translation = {"value": "", "example": ""}
+			
+			one_translation = {"value": "", "example": "", "synonym": ""}
+			
 			for translation_sub_element in translation_element.children:
+				
 				if isinstance(translation_sub_element, NavigableString) and not translation_sub_element.strip() == "":
-					print("string")
-					print(translation_sub_element)
+
 					if one_translation["value"] == "":
 						one_translation["value"] = translation_sub_element.rstrip()
 					else:
 						one_translation["value"] = one_translation["value"] + " " + translation_sub_element.rstrip()
 
 				else:
+					
 					if translation_sub_element.name == "a" and not translation_sub_element.text.strip() == "":
+						
 						if one_translation["value"] == "":
 							one_translation["value"] =  translation_sub_element.text.rstrip()
 						else:
 							one_translation["value"] = one_translation["value"] + " " + translation_sub_element.text.rstrip()
+							
 					if translation_sub_element.name == "dl":
-						one_translation["example"] = translation_sub_element.find("span", "h-usage-example").text
+						
+						if translation_sub_element.find("span", "h-usage-example"):
+							one_translation["example"] = translation_sub_element.find("span", "h-usage-example").text
+							
+						if translation_sub_element.find("span", "nyms synonym"):
+							text = translation_sub_element.find("span", "nyms synonym").text
+							print(text[:10])
+							print(text[:10] == "Synonyms: ")
+							if text[:10] == "Synonyms: ":
+								text = text[10:]
+							if text[:9] == "Synonym: ":
+								text = text[9:]
+							one_translation["synonym"] = text
+						
+						
 			translations.append(one_translation)
-				
-		
-		
 	
 	print(etymology)
 	print(translations)
@@ -64,6 +80,8 @@ def save_to_file(words, letter):
 
 def main():
 	get_word_translation("akár")
+	get_word_translation("megy")
+	
 	
 	
 	
