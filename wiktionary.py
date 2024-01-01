@@ -22,20 +22,31 @@ def get_word_translation(word):
 	
 	for translation_element in translations_list.children:
 		if not isinstance(translation_element, NavigableString):
+			print(translation_element.name)
+			one_translation = {"value": "", "example": ""}
 			for translation_sub_element in translation_element.children:
-				one_translation = []
 				if isinstance(translation_sub_element, NavigableString) and not translation_sub_element.strip() == "":
 					print("string")
 					print(translation_sub_element)
-					one_translation.append(translation_sub_element)
+					if one_translation["value"] == "":
+						one_translation["value"] = translation_sub_element.rstrip()
+					else:
+						one_translation["value"] = one_translation["value"] + " " + translation_sub_element.rstrip()
+
 				else:
-					if translation_sub_element.name == "a":
-						one_translation.append(translation_sub_element.text)
-				translations.append(one_translation)
+					if translation_sub_element.name == "a" and not translation_sub_element.text.strip() == "":
+						if one_translation["value"] == "":
+							one_translation["value"] =  translation_sub_element.text.rstrip()
+						else:
+							one_translation["value"] = one_translation["value"] + " " + translation_sub_element.text.rstrip()
+					if translation_sub_element.name == "dl":
+						one_translation["example"] = translation_sub_element.find("span", "h-usage-example").text
+			translations.append(one_translation)
+				
 		
 		
 	
-	# ~ print(etymology)
+	print(etymology)
 	print(translations)
 	
 	
