@@ -52,7 +52,6 @@ def get_word_translation(word):
 	
 	
 	
-	
 def get_translations(translations_list, word_definition):
 	
 	for translation_element in translations_list.children:
@@ -72,7 +71,7 @@ def get_translations(translations_list, word_definition):
 
 				else:
 					
-					if translation_sub_element.name == "a" and not translation_sub_element.text.strip() == "":
+					if (translation_sub_element.name == "a" or translation_sub_element.name == "span") and not translation_sub_element.text.strip() == "":
 						
 						if one_translation["value"] == "":
 							one_translation["value"] =  translation_sub_element.text.rstrip()
@@ -94,8 +93,8 @@ def get_translations(translations_list, word_definition):
 								text = text[9:]
 							one_translation["synonym"] = text
 						
-						
-			word_definition["translations"].append(one_translation)
+			if one_translation["value"]:			
+				word_definition["translations"].append(one_translation)
 	
 	
 def save_to_file(words, letter):	
@@ -107,7 +106,7 @@ def save_to_file(words, letter):
 	
 
 def main():
-	get_word_translation("tesz")
+	get_word_translation("fog")
 	
 	
 	
