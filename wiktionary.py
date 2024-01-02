@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, NavigableString, re
 import csv
 
 
@@ -14,11 +14,46 @@ def get_word_translation(word):
 
 	soup = BeautifulSoup(html, 'html.parser')
 	
-	etymology = soup.find(id="Etymology").parent.findNext("p").text
+	word_definition = {"etymology": "", "translations": [], "congugation": {}}
 	
-	translations_list = soup.find("strong", "Latn headword").parent.parent.findNext("ol")
+	content = soup.find("div", "mw-parser-output")
 	
-	translations = []
+	is_hungarian_section = False;
+		
+	for content_element in content.children:
+		
+		print(content_element.name)
+		
+		if content_element.name == "h2":
+			
+			if is_hungarian_section:
+				break
+
+			if content_element.find(id="Hungarian"):
+				
+				is_hungarian_section = True
+				
+				continue
+		
+		if is_hungarian_section:
+			 
+			if content_element.name == "h3" and content_element.find_all(id=re.compile("^Etymology")):
+	
+				word_definition["etymology"] = content_element.find_all(id=re.compile("^Etymology"))[0].parent.findNext("p").text
+				
+			if content_element.name == "ol":
+			
+				get_translations(content_element, word_definition)
+			
+	
+	
+	print(word_definition)
+	
+	
+	
+	
+	
+def get_translations(translations_list, word_definition):
 	
 	for translation_element in translations_list.children:
 		
@@ -51,23 +86,16 @@ def get_word_translation(word):
 							
 						if translation_sub_element.find("span", "nyms synonym"):
 							text = translation_sub_element.find("span", "nyms synonym").text
-							print(text[:10])
-							print(text[:10] == "Synonyms: ")
+
 							if text[:10] == "Synonyms: ":
 								text = text[10:]
+								
 							if text[:9] == "Synonym: ":
 								text = text[9:]
 							one_translation["synonym"] = text
 						
 						
-			translations.append(one_translation)
-	
-	print(etymology)
-	print(translations)
-	
-	
-	
-
+			word_definition["translations"].append(one_translation)
 	
 	
 def save_to_file(words, letter):	
@@ -79,8 +107,7 @@ def save_to_file(words, letter):
 	
 
 def main():
-	get_word_translation("akár")
-	get_word_translation("megy")
+	get_word_translation("tesz")
 	
 	
 	
