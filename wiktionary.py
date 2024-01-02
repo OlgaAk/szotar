@@ -1,11 +1,11 @@
 import requests
 from bs4 import BeautifulSoup, NavigableString, re
-import csv
+import json
 
 
 site_base_url = "https://en.wiktionary.org/wiki/"
 
-def get_word_translation(word):
+def get_word_definition(word):
 	word_url = site_base_url + word
 
 	response = requests.get(word_url)
@@ -21,8 +21,6 @@ def get_word_translation(word):
 	is_hungarian_section = False;
 		
 	for content_element in content.children:
-		
-		print(content_element.name)
 		
 		if content_element.name == "h2":
 			
@@ -46,8 +44,7 @@ def get_word_translation(word):
 				get_translations(content_element, word_definition)
 			
 	
-	
-	print(word_definition)
+	return word_definition
 	
 	
 	
@@ -97,16 +94,18 @@ def get_translations(translations_list, word_definition):
 				word_definition["translations"].append(one_translation)
 	
 	
-def save_to_file(words, letter):	
-	filename = letter + ".csv"
-	with open(filename, 'w') as myfile:
-		wr = csv.writer(myfile)
-		for word in words:
-			wr.writerow([word])
+def save_to_file(data, entity):	
+	filename = entity + ".json"
+	with open(filename, 'a+') as json_file:
+	  json.dump(data, json_file, ensure_ascii=False)
 	
 
 def main():
-	get_word_translation("fog")
+	words_list = ["fog", "tesz"]
+	for word in words_list:
+		definition = get_word_definition(word)
+		print(definition)
+		save_to_file(definition, "definitions")
 	
 	
 	
