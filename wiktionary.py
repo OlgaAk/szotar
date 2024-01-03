@@ -14,7 +14,7 @@ def get_word_definition(word):
 
 	soup = BeautifulSoup(html, 'html.parser')
 	
-	word_definition = {"etymology": "", "translations": [], "congugation": {}}
+	word_definition = {"etymology": "", "translations": [], "inflection": {}}
 	
 	content = soup.find("div", "mw-parser-output")
 	
@@ -42,6 +42,15 @@ def get_word_definition(word):
 			if content_element.name == "ol":
 			
 				get_translations(content_element, word_definition)
+			
+			if content_element.name == "div":
+				
+				table = content_element.find("table", "inflection-table")
+				
+				if table:
+				
+					get_inflections(table, word_definition)
+				
 			
 	
 	return word_definition
@@ -92,6 +101,46 @@ def get_translations(translations_list, word_definition):
 						
 			if one_translation["value"]:			
 				word_definition["translations"].append(one_translation)
+
+
+
+def get_inflections(table, word_definition):
+	inflections = {
+	"present": {"indef": {}, "def": {}}, 
+	"past": {"indef": {}, "def": {}}, 
+	"conditional": {"indef": {}, "def": {}},  
+	"subjunctive": {"indef": {}, "def": {}}, 
+	}
+	
+	inflection_positions = {
+	"present": {"indef": 1, "def": 2}, 
+	"past": {"indef": 4, "def": 5}, 
+	"conditional": {"indef": 7, "def": 8},  
+	"subjunctive": {"indef": 10, "def": 11}, 
+	}
+	
+	rows = table.find_all("tr")
+	
+	for key in inflection_positions.keys():
+		
+		for form in inflection_positions[key].keys():
+		
+			fill_inflection(inflections, inflection_positions, rows, key, form)
+
+	word_definition["inflection"] = inflections
+	
+
+
+def fill_inflection(inflections, inflection_positions, rows, mood, form):
+	
+	position = inflection_positions[mood][form]
+	
+	columns = rows[position].find_all("td")
+	
+	for i in range(6):	
+		print(columns[i].text.strip())
+		inflections[mood][form][i+1] = columns[i].text.strip().replace(u'\xa0or', u', ').replace(u' (or\xa0', u', ').replace(u')', u'')
+	
 	
 	
 def save_to_file(data, entity):	
@@ -101,12 +150,11 @@ def save_to_file(data, entity):
 	
 
 def main():
-	words_list = ["fog", "tesz"]
+	words_list = ["tesz"]
 	for word in words_list:
 		definition = get_word_definition(word)
 		print(definition)
 		save_to_file(definition, "definitions")
-	
 	
 	
 	
