@@ -1,21 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableHighlight } from 'react-native';
 import {useState} from 'react';
 import data from './definitions.json'
 
-export default function App() {
+export default function HomeScreen({navigation}) {
   const [text, setText] = useState('');
   const [wordList, setWordList] = useState(data);
   
   const onInputChanged = newText => {
-     console.log('hello')
     setText(newText)
-    console.log(newText)
     if(newText) {
       setWordList(data.filter(item => item.word.startsWith(newText.toLowerCase())))
     } else {
     setWordList(data)
     }
+  }
+  
+  const onPressWord = (item) => {
+	  navigation.navigate('WordScreen', {word: item})
   }
   
   return (
@@ -25,7 +27,7 @@ export default function App() {
    
     <TextInput
           style={styles.textInputStyle}
-          placeholder="Type here to find a word!"
+          placeholder="Type here to find a word"
           onChangeText={onInputChanged}
           defaultValue={text}
         />
@@ -36,7 +38,13 @@ export default function App() {
   
       <FlatList
         data={wordList}
-        renderItem={({item}) => <Text style={styles.word}>{item.word}</Text>}
+        renderItem={({item}) => (
+			<TouchableHighlight onPress={() => onPressWord(item)} underlayColor="white">
+				<Text style={styles.word}>{item.word}</Text>
+			</TouchableHighlight>
+			)
+		}
+			
       />
     
       <StatusBar style="auto" />
@@ -68,7 +76,8 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     height: 40,
     borderRadius: 8,
-    marginRight: 30
+    marginRight: 30,
+    paddingLeft: 12
   },
   word: {
     fontSize: 20,

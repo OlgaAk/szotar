@@ -1,8 +1,8 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {WordScreen} from '.WordScreen'
-import {HomeScreen} from '.HomeScreen'
+import WordScreen from './WordScreen'
+import HomeScreen from './HomeScreen.js'
 
 const Stack = createNativeStackNavigator();
 
@@ -12,11 +12,11 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Home"
+          name="HomeScreen"
           component={HomeScreen}
-          options={{title: 'Szotar'}}
+          options={{title: 'Dictionary'}}
         />
-        <Stack.Screen name="Word" component={WordScreen} />
+        <Stack.Screen name="WordScreen" component={WordScreen} options={{title: ''}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
